@@ -1,9 +1,11 @@
 #![allow(dead_code)]
 
+mod jobs;
+
 use cc_core::JobNumber;
 use egui::Key;
 
-mod jobs;
+const APP_NAME: &'static str = "CC shortcuts";
 
 const NATIVE_OPTIONS: eframe::NativeOptions = eframe::NativeOptions {
     always_on_top: false,
@@ -36,30 +38,34 @@ const NATIVE_OPTIONS: eframe::NativeOptions = eframe::NativeOptions {
 };
 
 fn main() {
-    eframe::run_native(
-        "CC shortcuts",
+    let result = eframe::run_native(
+        APP_NAME,
         NATIVE_OPTIONS,
-        Box::new(|_context| {
-            Box::new(MainApp {
-                job_number_field: String::new(),
-                job_number: None,
-                sub_app: None,
-            })
-        }),
-    )
-    .err()
-    .map_or_else(|| {}, |e| eprintln!("{}", e));
+        Box::new(|_context| Box::new(MainApp::default())),
+    );
+
+    if let Err(err) = result {
+        eprintln!("{err}")
+    }
 }
 
+#[derive(Default)]
 struct MainApp {
-    sub_app: Option<SubApps>,
-    job_number_field: String,
-    job_number: Option<JobNumber>,
+    edit_field: String,
 }
 
 impl eframe::App for MainApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        if let Some(sub_app) = &mut self.sub_app {
+        egui::CentralPanel::default().show(ctx, |ui| {
+            egui::widgets::TextEdit::singleline(&mut self.edit_field)
+                .desired_width(f32::INFINITY)
+                .show(ui);
+        });
+    }
+}
+
+/*
+if let Some(sub_app) = &mut self.sub_app {
             return match sub_app {
                 SubApps::Note(n) => n.update(ctx, frame),
             };
@@ -109,25 +115,4 @@ impl eframe::App for MainApp {
                 self.sub_app = Some(SubApps::Note(NoteApp {}));
             }
         });
-    }
-
-    fn on_close_event(&mut self) -> bool {
-        self.sub_app.take().is_none()
-    }
-}
-
-enum SubApps {
-    Note(NoteApp),
-}
-
-struct NoteApp {}
-
-impl eframe::App for NoteApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-        ctx.input(|input| {
-            if input.key_pressed(Key::Escape) {
-                frame.close();
-            }
-        });
-    }
-}
+*/
