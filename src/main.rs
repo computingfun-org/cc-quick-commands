@@ -2,9 +2,6 @@
 
 mod jobs;
 
-use cc_core::JobNumber;
-use egui::Key;
-
 const APP_NAME: &'static str = "CC shortcuts";
 
 const NATIVE_OPTIONS: eframe::NativeOptions = eframe::NativeOptions {
@@ -37,16 +34,12 @@ const NATIVE_OPTIONS: eframe::NativeOptions = eframe::NativeOptions {
     app_id: None,
 };
 
-fn main() {
-    let result = eframe::run_native(
+fn main() -> Result<(), eframe::Error> {
+    eframe::run_native(
         APP_NAME,
         NATIVE_OPTIONS,
         Box::new(|_context| Box::new(MainApp::default())),
-    );
-
-    if let Err(err) = result {
-        eprintln!("{err}")
-    }
+    )
 }
 
 #[derive(Default)]
